@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Preset } from '../types';
 import { Button } from '@/components/ui/button';
@@ -19,7 +18,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
-import { Trash2, Plus, Edit, Save } from 'lucide-react';
+import { Trash2, Plus, Edit, Save, RotateCw } from 'lucide-react';
 
 interface PresetManagerProps {
   presets: Preset[];
@@ -137,29 +136,42 @@ const PresetManager: React.FC<PresetManagerProps> = ({
 
       {presets.length > 0 ? (
         <div>
-          <Select 
-            value={currentPresetId || ''} 
-            onValueChange={onLoadPreset}
-            disabled={isSpinning}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select a preset" />
-            </SelectTrigger>
-            <SelectContent>
-              {presets.map((preset) => (
-                <SelectItem key={preset.id} value={preset.id}>
-                  {preset.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
+          <div className="flex items-center space-x-2">
+            <Select
+              value={currentPresetId || ''}
+              onValueChange={onLoadPreset}
+              disabled={isSpinning}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a preset" />
+              </SelectTrigger>
+              <SelectContent>
+                {presets.map((preset) => (
+                  <SelectItem key={preset.id} value={preset.id}>
+                    {preset.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={isSpinning}
+              onClick={() => {
+                if (currentPresetId) {
+                  onLoadPreset(currentPresetId);
+                }
+              }}
+            >
+              <RotateCw className="h-4 w-4" />
+            </Button>
+          </div>
           {currentPreset && (
-            <div className="mt-4 flex space-x-2">
+            <div className="flex space-x-2 mt-2">
               <Dialog open={isRenameDialogOpen} onOpenChange={setIsRenameDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     disabled={isSpinning}
                     onClick={() => {
@@ -187,8 +199,8 @@ const PresetManager: React.FC<PresetManagerProps> = ({
                 </DialogContent>
               </Dialog>
 
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
                 disabled={isSpinning}
                 onClick={() => handleDeletePreset(currentPreset)}
