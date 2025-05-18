@@ -2,31 +2,32 @@ export interface RandomSelector {
   selectRandomItem: <T>(items: T[]) => { item: T; targetAngle: number };
 }
 
-export const createRandomSelector = (random = Math.random): RandomSelector => {
-  return {
-    selectRandomItem: <T>(items: T[]) => {
-      if (items.length === 0) {
-        throw new Error('Cannot select from an empty array');
-      }
-      
-      // Generate a random angle between 0 and 360 degrees
-      const randomAngle = random() * 360;
-      
-      // Calculate which segment this angle falls into
-      const segmentAngle = 360 / items.length;
-      const targetIndex = Math.floor((randomAngle / 360) * items.length) % items.length;
-      
-      // Calculate the angle to the middle of the selected segment
-      const itemAngle = (targetIndex * segmentAngle) + (segmentAngle / 2);
-      
-      return {
-        item: items[targetIndex],
-        targetAngle: 360 - itemAngle // Convert to clockwise rotation from top
-      };
+export const createRandomSelector = (random = Math.random): RandomSelector => ({
+  selectRandomItem: <T>(items: T[]) => {
+    if (items.length === 0) {
+      throw new Error('Cannot select from an empty array');
     }
-  };
-};
 
-// Default export with Math.random
-const defaultRandomSelector = createRandomSelector();
-export default defaultRandomSelector;
+    // Pick a random index directly
+    const targetIndex = Math.floor(random() * items.length);
+
+    // Each slice spans this many degrees
+    const segmentAngle = 360 / items.length;
+
+    // We want the wheel to land at the center of that slice:
+    // (index + 0.5) * segmentAngle gives the mid-angle of the slice
+    const midSliceAngle = (targetIndex + 0.5) * segmentAngle;
+
+    // Convert to clockwise-from-top (0° at top, increasing clockwise)
+    // and ensure it’s in [0, 360)
+    const targetAngle = (360 - midSliceAngle + 360) % 360;
+
+    return {
+      item: items[targetIndex],
+      targetAngle
+    };
+  }
+});
+
+// default export
+export default createRandomSelector();
