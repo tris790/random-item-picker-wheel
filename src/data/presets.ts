@@ -11,13 +11,13 @@ export const DEFAULT_PRESETS: Preset[] = [
         name: "RotMG Classes",
         items: [
             "Rogue", "Archer", "Assassin", "Huntress", "Trickster",
-            "Bard", "Summoner", "Warrior", "Knight", "Paladin",
+            "Bard", "Summoner", "Druid", "Warrior", "Knight", "Paladin",
             "Samurai", "Kensei", "Wizard", "Priest", "Necromancer",
             "Mystic", "Sorcerer", "Ninja"
         ],
         originalItems: [
             "Rogue", "Archer", "Assassin", "Huntress", "Trickster",
-            "Bard", "Summoner", "Warrior", "Knight", "Paladin",
+            "Bard", "Summoner", "Druid", "Warrior", "Knight", "Paladin",
             "Samurai", "Kensei", "Wizard", "Priest", "Necromancer",
             "Mystic", "Sorcerer", "Ninja"
         ],
