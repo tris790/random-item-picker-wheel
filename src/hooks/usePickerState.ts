@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
-import { DEFAULT_PRESETS, type Preset } from "../data/presets";
+import { DEFAULT_PRESETS, PRESETS_VERSION, type Preset } from "../data/presets";
 
-const STORAGE_KEY = "random-picker-state-v1";
+const STORAGE_KEY = "random-picker-state-v2";
 
 export type PickerState = {
     lists: Preset[];
     activeListId: string;
     removeAfterPick: boolean;
     animationDuration: number; // in seconds
+    version: number;
 };
 
 const DEFAULT_STATE: PickerState = {
@@ -15,6 +16,7 @@ const DEFAULT_STATE: PickerState = {
     activeListId: DEFAULT_PRESETS[0]?.id || "",
     removeAfterPick: false,
     animationDuration: 3,
+    version: PRESETS_VERSION,
 };
 
 export function usePickerState() {
@@ -28,14 +30,16 @@ export function usePickerState() {
                     // Simple migration/validation: ensure activeListId exists
                     if (!parsed.lists || parsed.lists.length === 0) return DEFAULT_STATE;
 
-                    // Sync missing default presets (useful for updates)
-                    const existingIds = new Set(parsed.lists.map((l: Preset) => l.id));
-                    const newPresets = DEFAULT_PRESETS.filter(p => !existingIds.has(p.id));
-
-                    if (newPresets.length > 0) {
+                    // Check version: if stored version is older, reset default presets
+                    const storedVersion = parsed.version || 0;
+                    if (storedVersion < PRESETS_VERSION) {
+                        console.log(`Preset version outdated (${storedVersion} < ${PRESETS_VERSION}), resetting default presets...`);
+                        // Keep user-created lists (those without isDefault flag)
+                        const userLists = parsed.lists.filter((l: Preset) => !l.isDefault);
                         return {
-                            ...parsed,
-                            lists: [...newPresets, ...parsed.lists],
+                            ...DEFAULT_STATE,
+                            lists: [...DEFAULT_PRESETS, ...userLists],
+                            activeListId: DEFAULT_PRESETS[0]?.id || "",
                         };
                     }
 
@@ -61,6 +65,7 @@ export function usePickerState() {
             name,
             items: [...items],
             originalItems: [...items],
+            isDefault: false,
         };
         setState(prev => ({
             ...prev,
